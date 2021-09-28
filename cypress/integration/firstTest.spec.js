@@ -1,5 +1,7 @@
 /// <reference types = "cypress"/> 
 
+const { equal } = require("assert")
+
 describe('My First Test Suite', () => {
     
     it('first test',()=>{
@@ -66,7 +68,7 @@ describe('My First Test Suite', () => {
 
     })
 
-    it('Then and Wrap methods',()=> {
+    it.only('Then and Wrap methods',()=> {
         cy.visit('/')
         cy.contains('Forms').click()
         cy.contains('Form Layouts').click()
@@ -80,17 +82,37 @@ describe('My First Test Suite', () => {
         /*selenuim style 
         const firstForm = cy.contains('nb-card','Basic form')
         firstForm.find('[for="inputEmail1"]').should('contain','Email')
+
+
+        -----------------------------------------------------------------------------------------------------------
+        The reason we cannot save using this traditional method is that cypress is ASYNCHRONOUS 
+        Meaning that these results/information we expect will not render sequentially.
+        Thus the info we seek may not be available when we set variables 
+
+        Therefore we need to use cypress methods 
         */
 
         //cypress style 
 
-        cy.contains('nb-card','Using the Grid').then( firstForm => {
-
-            //"Find" becomes a JQuery method as opposed to it previously being used as a cypress format
+        cy.contains('nb-card','Using the Grid').then( firstForm => {  //can use ES formatting here and have function names etc.
+            //the .then methods parses the variable passed in i.e."firstForm" as a JQuery Object
+            //"Find" becomes a JQuery method when used as below. "Find" in the cypress context does not behave the same as JQuery context
             const emailLabelForFirstForm = firstForm.find('[for="inputEmail1"]').text()     
             const passwordLabelForFirstForm = firstForm.find('[for="inputPassword2"]').text()
             expect(emailLabelForFirstForm).to.equal('Email')
             expect(passwordLabelForFirstForm).to.equal('Password')
+
+
+            //to compare between variables between first and second form, use nested cy.contains 
+            cy.contains('nb-card','Basic form').then( secondForm => {
+                const passwordLabelSecondForm = secondForm.find('[for="exampleInputPassword1"]').text()
+                
+                //expect is a chai assertion 
+                expect(passwordLabelForFirstForm).to.equal(passwordLabelSecondForm) 
+                
+                //to convert this back to a cypress function, use cy.wrap()
+                cy.wrap(secondForm).find('[for="exampleInputPassword1"]').should('contain','Password')
+            })
         })
 
     })
