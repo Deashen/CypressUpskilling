@@ -68,7 +68,7 @@ describe('My First Test Suite', () => {
 
     })
 
-    it.only('Then and Wrap methods',()=> {
+    it('Then and Wrap methods',()=> {
         cy.visit('/')
         cy.contains('Forms').click()
         cy.contains('Form Layouts').click()
@@ -115,5 +115,53 @@ describe('My First Test Suite', () => {
             })
         })
 
+    })
+
+    it('invoke command tests', () => {
+        cy.visit('/')
+        cy.contains('Forms').click()
+        cy.contains('Form Layouts').click()
+
+
+        //version 1 basic way
+        cy.get('[for="exampleInputEmail1"]').should('contain','Email address')
+
+        //version 2 using then
+        cy.get('[for="exampleInputEmail1"]').then( label =>{
+            expect(label.text()).to.equal('Email address')
+        })
+
+        cy.get('[for="exampleInputEmail1"]').invoke('text').then( text =>{
+            expect(text).to.equal('Email address')
+        })
+
+
+        //version 3 - 1 - using invoke function
+        cy.contains('nb-card','Basic form')
+            .find('nb-checkbox')
+            .click()
+            .find('.custom-checkbox')
+            .invoke('attr','class')
+            //option 1 - use should for assertion
+            //.should('contain','checked') 
+            // an alternate way to do the above step is to use chai assertions by using then method
+            .then(classValue =>{
+                expect(classValue).to.contain('checked')
+            })
+
+    })
+
+    //cy.invoke is powerful for assertions - read up on invoke docs on cypress.io
+    
+    it.only('Invoke Assert on html property',() => {
+        cy.visit('/')
+        cy.contains('Forms').click()
+        cy.contains('Datepicker').click()
+
+        cy.contains('nb-card','Common Datepicker').find('input').then( input => {
+            cy.wrap(input).click()
+            cy.get('nb-calendar-day-picker').contains('17').click()
+            cy.wrap(input).invoke('prop','value').should('contain','17')
+        })
     })
 })
