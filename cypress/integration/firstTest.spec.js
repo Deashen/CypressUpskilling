@@ -152,8 +152,7 @@ describe('My First Test Suite', () => {
     })
 
     //cy.invoke is powerful for assertions - read up on invoke docs on cypress.io
-    
-    it.only('Invoke Assert on html property',() => {
+    it('Invoke Assert on html property',() => {
         cy.visit('/')
         cy.contains('Forms').click()
         cy.contains('Datepicker').click()
@@ -164,4 +163,45 @@ describe('My First Test Suite', () => {
             cy.wrap(input).invoke('prop','value').should('contain','17')
         })
     })
+
+    it('Radio button scenarios - using .check()', () => {
+        cy.visit('/')
+        cy.contains('Forms').click()
+        cy.contains('Form Layouts').click()
+
+        cy.contains('nb-card','Using the Grid').find('[type="radio"]').then( radioButtons => {
+            cy.wrap(radioButtons)
+                .first()
+                .check({force:true})
+                .should('be.checked')
+
+            cy.wrap(radioButtons)
+                .eq(1)
+                .check({force:true})
+
+            cy.wrap(radioButtons)
+                .first() //can use .eq(0) - first brings the first value from list of results in object radioButtons
+                .should('not.be.checked')
+
+            cy.wrap(radioButtons)
+                .eq(2)
+                .should('be.disabled')
+        })
+    })
+
+    it.only('Checkboxes scenario',() => {
+        cy.visit('/')
+        cy.contains('Modal & Overlays').click()
+        cy.contains('Toastr').click()
+
+        cy.get('[type="checkbox"]').check({force:true})  // check method will ensure checkbox is check - will not uncheck if already checked
+        cy.get('[type="checkbox"]').eq(0).click({force:true}) //to uncheck a already checked box
+        cy.get('[type="checkbox"]').eq(1).click({force:true}) //to recheck the unchecked box lol 
+        cy.get('[type="checkbox"]').eq(2).click({force:true})
+        // cy.get('[type="checkbox"]').eq(0).click({force:true})
+        // cy.get('[type="checkbox"]').eq(1).click({force:true})
+        // cy.get('[type="checkbox"]').eq(2).click({force:true})
+        cy.get('[type="checkbox"]').check({force:true})
+    })
+
 })
